@@ -1,14 +1,15 @@
 package com.example.animatevisibility
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.animatevisibility.ui.theme.AnimateVisibilityTheme
@@ -57,11 +59,22 @@ private fun MainScreen() {
     // criando estado booleano para guardar informacoes do botao ao clicar nele
     var state by rememberSaveable { mutableStateOf(true) }
 
+    var estado1 by rememberSaveable { mutableStateOf(1) }
+
     // funcao onClick usada para modificar o estado state
     val onClick = {it: Boolean ->
         state = it
     }
 
+    val nextImage = {
+        if (estado1 >= 3) {
+            estado1 = 1
+        } else {
+            estado1 += 1
+        }
+    }
+
+    Log.i("TAGY", "$estado1")
     Box(
         Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -88,11 +101,54 @@ private fun MainScreen() {
                 enter = fadeIn(animationSpec = tween(2000)),
                 exit = fadeOut(animationSpec = tween(2000))
             ) {
-                Box(modifier = Modifier
-                    .size(height = 200.dp, width = 200.dp)
-                    .background(Color.Blue))
+                Box(
+                    modifier = Modifier
+                        .size(height = 200.dp, width = 200.dp)
+                        .background(Color.Blue)
+                )
+            }
+
+            Button(onClick = { nextImage() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                )) {
+                Crossfade(
+                    targetState = estado1,
+                    animationSpec = tween(5000),
+                    label = "",
+                ) {
+                    when (it) {
+                        1 -> {
+                            CrossF(image = R.drawable.dbzall, state)
+                        }
+
+                        2 -> {
+                            CrossF(image = R.drawable.goku, state)
+                        }
+
+                        3 -> {
+                            CrossF(image = R.drawable.dragonball, state)
+                        }
+                    }
+                }
+
             }
         }
+    }
+}
+
+@Composable
+private fun CrossF(image: Int, state: Boolean) {
+    AnimatedVisibility(
+        visible = state,
+        enter = fadeIn(animationSpec = tween(5000)),
+        exit = fadeOut(animationSpec = tween(5000))
+    ) {
+        Image(
+            painter = painterResource(id = image),
+            contentDescription = "Imagem legal",
+            modifier = Modifier.size(300.dp)
+        )
         
     }
 }
